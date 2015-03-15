@@ -1,0 +1,114 @@
+﻿using UnityEngine;
+using System.Collections;
+
+public abstract class Zombie : MonoBehaviour 
+{
+	// the following 5 are set upon spawning
+	public Transform[] Track;
+	public int TrackNumber; // 0 for outer, 1 for middle, 2 for inner
+	public int TrackIndex; // index in the track
+	public Initializer.ZombieMovementDirection direction;
+
+	protected Transform survivor;
+	protected Initializer BlackBoard;
+	protected NavMeshAgent Nav;
+	protected float speed;
+
+	protected bool SurvivorSpotted = false;
+
+	// Use this for initialization
+	void Start () 
+	{
+		BlackBoard = GameObject.Find ("Level").GetComponent<Initializer> ();
+		survivor = BlackBoard.Survivor;
+		Nav = gameObject.GetComponent<NavMeshAgent> ();
+		speed = BlackBoard.v;
+
+		Nav.acceleration = 9999999f; // want intantaneous speed adjustment
+		Nav.destination = Track [TrackIndex].position;
+
+		AdditionalSetup ();
+	}
+
+	protected abstract void AdditionalSetup();
+	
+	// Update is called once per frame
+	void Update () 
+	{
+		if( ! SurvivorSpotted )
+		{
+			SeenByPlayer (); // highlights the zombie if the player can see it
+			ZombieMovement();
+			LookForSurvivor ();
+
+			// Check to see if arrived
+			Vector3 pos = gameObject.transform.position;
+			if( pos.x == Nav.destination.x && pos.z == Nav.destination.z)
+			{
+				AssignNextWayPoint();
+				Nav.destination = Track[TrackIndex].position;
+			}
+
+		}
+		else 
+		{
+			if( survivor != null ) // Survivor isn't dead
+			{
+				Nav.SetDestination(survivor.position);
+				// TODO: check to see if player is touched and if so kill him
+			}
+		}
+	}
+
+	public void SeenByPlayer ()
+	{
+		Vector3 playerPos = survivor.position;
+		Vector3 guardPos = gameObject.transform.position + Vector3.up * 3;
+		
+		Vector3 playerDirection = playerPos - guardPos;
+
+		RaycastHit hit;
+		LayerMask mask = ~(1 << LayerMask.NameToLayer ("Zombies"));
+		if(Physics.Raycast(guardPos, playerDirection, out hit, 200f, mask))
+		{
+			bool seen = false;
+			if(hit.transform.tag == "Player")
+			{
+				seen = true;
+			}
+
+			Transform Base = gameObject.transform.FindChild("Base");
+			if( seen )
+			{
+				Base.renderer.enabled = true;
+			}
+			else
+			{
+				Base.renderer.enabled = false;
+			}
+		}
+	}
+
+	public void LookForSurvivor ()
+	{
+		if( BlackBoard.SurvivorSpotted )
+		{
+			SurvivorSpotted = true;
+		}
+
+		else
+		{
+			// TODO: try to spot survivor
+		}
+	}
+
+	protected abstract void ZombieMovement();
+
+	private void AssignNextWayPoint()
+	{
+		if(direction == Initializer.ZombieMovementDirection.Clockwise)
+			TrackIndex = (TrackIndex + 1) % Track.Length;
+		else
+			TrackIndex = (Mathf.Abs(TrackIndex - 1)) % Track.Length;
+	}
+}

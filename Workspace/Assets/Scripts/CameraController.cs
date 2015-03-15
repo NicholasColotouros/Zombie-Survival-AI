@@ -6,7 +6,7 @@ public class CameraController : MonoBehaviour
 	public float MovementSpeed;
 	public float ZoomSpeed;
 
-	// Maximum
+	// Boundaries
 	public Vector2 MaxCameraBounds;
 	public Vector2 MinCameraBounds;
 	public float MaxCameraZoom;
