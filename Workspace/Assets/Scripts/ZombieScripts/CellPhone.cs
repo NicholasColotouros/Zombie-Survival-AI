@@ -29,5 +29,11 @@ public class CellPhone : Shambler
 			else
 				direction = Initializer.ZombieMovementDirection.Clockwise;
 		}
+
+		if( stopped )
+		{
+			Nav.Resume();
+			stopped = false;
+		}
 	}
 }

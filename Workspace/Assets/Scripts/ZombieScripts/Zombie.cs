@@ -25,7 +25,7 @@ public abstract class Zombie : MonoBehaviour
 		speed = BlackBoard.v;
 
 		Nav.acceleration = 9999999f; // want intantaneous speed adjustment
-		Nav.destination = Track [TrackIndex].position;
+		Nav.SetDestination(Track [TrackIndex].position);
 
 		AdditionalSetup ();
 	}
@@ -46,7 +46,7 @@ public abstract class Zombie : MonoBehaviour
 			if( pos.x == Nav.destination.x && pos.z == Nav.destination.z)
 			{
 				AssignNextWayPoint();
-				Nav.destination = Track[TrackIndex].position;
+				Nav.SetDestination( Track[TrackIndex].position);
 			}
 
 		}
@@ -55,7 +55,6 @@ public abstract class Zombie : MonoBehaviour
 			if( survivor != null ) // Survivor isn't dead
 			{
 				Nav.SetDestination(survivor.position);
-				// TODO: check to see if player is touched and if so kill him
 			}
 		}
 	}
@@ -98,7 +97,14 @@ public abstract class Zombie : MonoBehaviour
 
 		else
 		{
-			// TODO: try to spot survivor
+			bool spotted = gameObject.transform.FindChild("VisionRectangle").GetComponent<VisionTrigger>().SurvivorEntered;
+			if( spotted )
+			{
+				BlackBoard.SurvivorSpotted = true;
+				SurvivorSpotted = true;
+			}
+
+			// TODO: check alcoves
 		}
 	}
 

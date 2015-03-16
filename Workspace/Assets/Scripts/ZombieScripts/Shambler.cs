@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Shambler : Zombie 
+// Inherits from classic because aside from the movement speed,
+// and lane changing (done in additional setup) the behaviour
+// is the same.
+public class Shambler : Classic 
 {
 	protected override void AdditionalSetup ()
 	{
@@ -9,11 +12,6 @@ public class Shambler : Zombie
 		InvokeRepeating ("ChangeTracks", 0f, 2f);
 	}
 	
-	protected override void ZombieMovement ()
-	{
-		// TODO stop when a zombie gets too close
-	}
-
 	protected void ChangeTracks()
 	{
 		if( SurvivorSpotted )
@@ -52,6 +50,22 @@ public class Shambler : Zombie
 
 	protected void SwitchToLane(int n)
 	{
-		// TODO
+		if( TrackNumber == 0 )
+			Track = BlackBoard.OuterTrack;
+		else if( TrackNumber == 1)
+			Track = BlackBoard.MiddleTrack;
+		else if( TrackNumber == 2)
+			Track = BlackBoard.InnerTrack;
+
+		// TODO: move into that lane
+
+		Nav.SetDestination (Track [TrackIndex].position);
+
+		// once destination is set:
+		if( stopped )
+		{
+			stopped = false;
+			Nav.Resume();
+		}
 	}
 }
