@@ -24,6 +24,7 @@ public abstract class Zombie : MonoBehaviour
 		Nav = gameObject.GetComponent<NavMeshAgent> ();
 		speed = BlackBoard.v;
 
+		Nav.speed = speed;
 		Nav.acceleration = 9999999f; // want intantaneous speed adjustment
 		Nav.SetDestination(Track [TrackIndex].position);
 
@@ -43,7 +44,7 @@ public abstract class Zombie : MonoBehaviour
 
 			// Check to see if arrived
 			Vector3 pos = gameObject.transform.position;
-			if( pos.x == Nav.destination.x && pos.z == Nav.destination.z)
+			if( pos.x == Track[TrackIndex].position.x && pos.z == Track[TrackIndex].position.z)
 			{
 				AssignNextWayPoint();
 				Nav.SetDestination( Track[TrackIndex].position);
@@ -52,10 +53,8 @@ public abstract class Zombie : MonoBehaviour
 		}
 		else 
 		{
-			if( survivor != null ) // Survivor isn't dead
-			{
-				Nav.SetDestination(survivor.position);
-			}
+			// chase the survivor
+			Nav.SetDestination(survivor.position);
 		}
 	}
 

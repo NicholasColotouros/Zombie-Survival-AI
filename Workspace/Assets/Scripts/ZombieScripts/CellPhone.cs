@@ -7,8 +7,10 @@ public class CellPhone : Shambler
 {
 	protected override void AdditionalSetup ()
 	{
-		InvokeRepeating ("ChangeTracks", 0f, 2f);
-		InvokeRepeating ("ChangeDirection", 0f, 2f);
+		//InvokeRepeating ("ChangeTracks", 2f, 2f);
+		InvokeRepeating ("ChangeDirection", 2f, 2f);
+		InvokeRepeating ("LookAtCellPhone", 5f, 5f);
+
 	}
 
 	protected void ChangeDirection()
@@ -35,5 +37,26 @@ public class CellPhone : Shambler
 			Nav.Resume();
 			stopped = false;
 		}
+	}
+
+	protected void LookAtCellPhone()
+	{
+		if( SurvivorSpotted )
+		{
+			CancelInvoke("LookAtCellPhone");
+			return;
+		}
+
+		int diceroll = Random.Range (0, 2);
+		if( diceroll == 1 )
+		{
+			Nav.Stop();
+			Invoke( "PutAwayCellPhone", 3f);
+		}
+	}
+
+	protected void PutAwayCellPhone()
+	{
+		Nav.Resume ();
 	}
 }
