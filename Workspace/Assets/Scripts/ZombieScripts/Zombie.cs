@@ -15,6 +15,7 @@ public abstract class Zombie : MonoBehaviour
 	protected float speed;
 
 	protected bool SurvivorSpotted = false;
+	private bool JustSpawned = true; // to prevent immediate despawn
 
 	// Use this for initialization
 	void Start () 
@@ -38,6 +39,7 @@ public abstract class Zombie : MonoBehaviour
 	{
 		if( ! SurvivorSpotted )
 		{
+			// check to make sure there is a destination
 			SeenByPlayer (); // highlights the zombie if the player can see it
 			ZombieMovement();
 			LookForSurvivor ();
@@ -46,8 +48,19 @@ public abstract class Zombie : MonoBehaviour
 			Vector3 pos = gameObject.transform.position;
 			if( pos.x == Track[TrackIndex].position.x && pos.z == Track[TrackIndex].position.z)
 			{
-				AssignNextWayPoint();
-				Nav.SetDestination( Track[TrackIndex].position);
+				// see if the zombie should be despawned
+				int d100 = Random.Range(1,101);
+				if( d100 <= BlackBoard.p && !JustSpawned )
+				{
+					// the zombies themselves should implement ondestroy to ensure the count is maintained
+					Destroy(gameObject);
+				}
+				else
+				{
+					AssignNextWayPoint();
+					Nav.SetDestination( Track[TrackIndex].position);
+					JustSpawned = false;
+				}
 			}
 
 		}
@@ -114,6 +127,9 @@ public abstract class Zombie : MonoBehaviour
 		if(direction == Initializer.ZombieMovementDirection.Clockwise)
 			TrackIndex = (TrackIndex + 1) % Track.Length;
 		else
-			TrackIndex = (Mathf.Abs(TrackIndex - 1)) % Track.Length;
+		{
+			TrackIndex--;
+			if(TrackIndex < 0) TrackIndex = Track.Length - 1;
+		}
 	}
 }

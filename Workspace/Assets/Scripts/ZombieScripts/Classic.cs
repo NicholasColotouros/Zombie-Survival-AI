@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Classic : Zombie 
 {
-	protected float CloseDist = 5f; // distance that a zombie is considered too close
+	protected float CloseDist = 500f; // distance that a zombie is considered too close
 	protected bool stopped = false;
 
 	protected override void AdditionalSetup ()
@@ -18,9 +18,9 @@ public class Classic : Zombie
 		Vector3 direction = gameObject.transform.forward;
 		
 		RaycastHit hit;
-		if(Physics.Raycast(gameObject.transform.position, direction, out hit, CloseDist, 100))
+		if(Physics.Raycast(gameObject.transform.position, direction, out hit, CloseDist, -1))
 		{
-			if(hit.transform.tag == "Zombie")
+			if(hit.transform.gameObject.layer == LayerMask.NameToLayer("Zombies"))
 			{
 				Nav.Stop();
 				stopped = true;
@@ -31,5 +31,10 @@ public class Classic : Zombie
 				stopped = false;
 			}
 		}
+	}
+
+	void OnDestroy()
+	{
+		BlackBoard.DecrementEasy (TrackIndex);
 	}
 }

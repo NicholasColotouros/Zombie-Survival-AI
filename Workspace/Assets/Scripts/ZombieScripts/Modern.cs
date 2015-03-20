@@ -10,4 +10,9 @@ public class Modern : Zombie
 
 	// The navmesh will take care of overtaking
 	protected override void ZombieMovement (){}
+
+	void OnDestroy()
+	{
+		BlackBoard.DecrementHard (TrackIndex);
+	}
 }

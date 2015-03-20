@@ -9,7 +9,7 @@ public class Shambler : Classic
 	protected override void AdditionalSetup ()
 	{
 		Nav.speed = speed / 2;
-		InvokeRepeating ("ChangeTracks", 2f, 2f);
+		InvokeRepeating ("ChangeTracks", 5f, 5f);
 	}
 	
 	protected void ChangeTracks()

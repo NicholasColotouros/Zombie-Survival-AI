@@ -7,9 +7,9 @@ public class CellPhone : Shambler
 {
 	protected override void AdditionalSetup ()
 	{
-		//InvokeRepeating ("ChangeTracks", 2f, 2f);
-		InvokeRepeating ("ChangeDirection", 2f, 2f);
-		InvokeRepeating ("LookAtCellPhone", 5f, 5f);
+		//InvokeRepeating ("ChangeTracks", 5f, 5f);
+		InvokeRepeating ("ChangeDirection", 7f, 7f);
+		InvokeRepeating ("LookAtCellPhone", 10f, 10f);
 
 	}
 
@@ -58,5 +58,10 @@ public class CellPhone : Shambler
 	protected void PutAwayCellPhone()
 	{
 		Nav.Resume ();
+	}
+
+	void OnDestroy()
+	{
+		BlackBoard.DecrementHard (TrackIndex);
 	}
 }
