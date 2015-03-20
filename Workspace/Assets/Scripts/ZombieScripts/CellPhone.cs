@@ -7,10 +7,10 @@ public class CellPhone : Shambler
 {
 	protected override void AdditionalSetup ()
 	{
-		//InvokeRepeating ("ChangeTracks", 5f, 5f);
+		InvokeRepeating ("ChangeTracks", 5f, 5f);
 		InvokeRepeating ("ChangeDirection", 7f, 7f);
 		InvokeRepeating ("LookAtCellPhone", 10f, 10f);
-
+		InvokeRepeating ("ChangeSpeed", 1f, 1f);
 	}
 
 	protected void ChangeDirection()
@@ -53,6 +53,12 @@ public class CellPhone : Shambler
 			Nav.Stop();
 			Invoke( "PutAwayCellPhone", 3f);
 		}
+	}
+
+	protected void ChangeSpeed()
+	{
+		float newSpeed = Random.Range (speed / 2, 2 * speed);
+		Nav.speed = newSpeed;
 	}
 
 	protected void PutAwayCellPhone()

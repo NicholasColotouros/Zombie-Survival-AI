@@ -26,17 +26,17 @@ public class Initializer : MonoBehaviour
 	private int lastWaypoint;
 
 	// number of zombies of each needed
-	public int easy;
-	public int hard;
+	private int easy;
+	private int hard;
 
 	// number of zombies of each present
-	public int easy_spawned;
-	public int hard_spawned;
+	private int easy_spawned;
+	private int hard_spawned;
 
 	private Object hardLock = new Object();
 	private Object easyLock = new Object();
 
-	public int firstWaveCounter; // used to make sure the first wave of zombies are all easy
+	private int firstWaveCounter; // used to make sure the first wave of zombies are all easy
 	private bool firstWave = true;
 
 	// Use this for initialization
