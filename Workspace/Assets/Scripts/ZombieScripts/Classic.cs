@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Classic : Zombie 
 {
-	protected float CloseDist = 500f; // distance that a zombie is considered too close
+	protected float CloseDist = 10f; // distance that a zombie is considered too close
 	protected bool stopped = false;
 
 	protected override void AdditionalSetup ()
@@ -15,21 +15,33 @@ public class Classic : Zombie
 	// stop if the raycast hits something (as it will be too close)
 	protected override void ZombieMovement ()
 	{
+		bool detectedZombie = false;
+		// TODO: bugged. resume is never hit
 		Vector3 direction = gameObject.transform.forward;
 		
 		RaycastHit hit;
-		if(Physics.Raycast(gameObject.transform.position, direction, out hit, CloseDist, -1))
+		Vector3 origin = gameObject.transform.position + gameObject.transform.up;
+		LayerMask mask = 1 << LayerMask.NameToLayer ("Zombies");
+		if(Physics.Raycast(origin, direction, out hit, CloseDist, mask))
 		{
 			if(hit.transform.gameObject.layer == LayerMask.NameToLayer("Zombies"))
 			{
-				Nav.Stop();
+				Debug.Log(hit.transform.name);
+			
+				detectedZombie = true;
+				if( ! stopped )
+				{
+					Debug.Log("st");
+					Nav.Stop();
+				}
 				stopped = true;
 			}
-			else if (stopped)
-			{
-				Nav.Resume();
-				stopped = false;
-			}
+		}
+		if( ! detectedZombie && stopped)
+		{
+			Debug.Log("resume" );
+			Nav.Resume();
+			stopped = false;
 		}
 	}
 
