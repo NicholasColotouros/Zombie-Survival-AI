@@ -36,15 +36,14 @@ public class Initializer : MonoBehaviour
 
 	private Object hardLock = new Object();
 	private Object easyLock = new Object();
+	private Object queueLock = new Object();
 
-	private int firstWaveCounter; // used to make sure the first wave of zombies are all easy
-	private bool firstWave = true;
-	private Queue<Transform> spawnQueue; //
+	private Queue<Transform> SpawnQueue;
 
 	// Use this for initialization
 	void Start () 
 	{
-		firstWaveCounter = n;
+		SpawnQueue = new Queue<Transform> ();
 		easy_spawned = 0;
 		hard_spawned = 0;
 
@@ -61,26 +60,27 @@ public class Initializer : MonoBehaviour
 		{
 			Direction = ZombieMovementDirection.Clockwise;
 		}
+
+		// Fill the spawn queue for the first wave
+		for( int i = 0; i < n; i++)
+		{
+			int diceroll = Random.Range(0, EasyZombies.Length);
+			SpawnQueue.Enqueue( EasyZombies[diceroll] );
+			easy_spawned++;
+		}
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
-		if(firstWaveCounter > 0 && firstWave)
-		{
-			SpawnZombie(EasyZombies);
-			firstWaveCounter--;
-			easy_spawned++;
-
-			if( firstWaveCounter == 0 ) firstWave = false;
-		}
-		else if (!SurvivorSpotted) 
-			SpawnZombies ();
-
+		MaintainZombies ();
+		SpawnZombie (InnerTrack, 2);
+		SpawnZombie (MiddleTrack, 1);
+		SpawnZombie (OuterTrack, 0);
 	}
 
-	// spawns zombies while maintaining the ratio
-	private void SpawnZombies()
+	// Adds zombies to the spawn queue while maintaining the ratio
+	private void MaintainZombies()
 	{
 		if( easy_spawned + hard_spawned < n)
 		{
@@ -98,47 +98,68 @@ public class Initializer : MonoBehaviour
 			{
 				lock( easyLock )
 				{
-					SpawnZombie(EasyZombies);
 					easy_spawned++;
+
+					lock( queueLock )
+					{
+						int zombietype = Random.Range(0, EasyZombies.Length);
+						SpawnQueue.Enqueue( EasyZombies[zombietype] );
+					}
 				}
 			}
 			if( diceroll == 0 )
 			{
 				lock( hardLock )
 				{
-					SpawnZombie(HardZombies);
 					hard_spawned++;
+
+					lock( queueLock )
+					{
+						int zombietype = Random.Range(0, HardZombies.Length);
+						SpawnQueue.Enqueue( HardZombies[zombietype] );
+					}
 				}
 			}
 		}
 	}
 
 	// spawns easy zombies at a random available location
-	private void SpawnZombie(Transform[] zombiePrefabs)
+	private void SpawnZombie(Transform[] track, int trackNumber)
 	{
-		int selectedTrack = Random.Range (0, 3);
-		int selectedWayPoint = Random.Range (0, 4);
+		bool emptyQueue = false;
 
-		if( selectedWayPoint == lastWaypoint)
-			selectedWayPoint = (lastWaypoint + 1) % 4;
+		lock(queueLock)
+		{
+			if(SpawnQueue.Count == 0)
+				emptyQueue = true;
+		}
 
-		// get the track
-		Transform[] track = InnerTrack;
-		if( selectedTrack == 1 ) track = MiddleTrack;
-		if( selectedTrack == 0 ) track = OuterTrack;
+		if( !emptyQueue )
+		{
+			int selectedWayPoint = Random.Range (0, 4);
 
+			if( selectedWayPoint == lastWaypoint)
+				selectedWayPoint = (lastWaypoint + 1) % 4;
 
-		Vector3 spawnpoint = track[selectedWayPoint].position;
+			// Don't spawn anything if there is already a zombie there
+			if( track[selectedWayPoint].GetComponent<SpawnAreaCounter>().Counter > 0 )
+				return;
 
-		int selectedZombie = Random.Range (0, 2);
-		Transform spawnedZombie = Instantiate (zombiePrefabs [selectedZombie], spawnpoint, Quaternion.identity) as Transform;
+			Vector3 spawnpoint = track[selectedWayPoint].position;
 
-		Zombie properties = spawnedZombie.GetComponent<Zombie> ();
-		properties.Track = track;
-		properties.TrackIndex = selectedWayPoint;
-		properties.TrackNumber = selectedTrack;
+			Transform zombietospawn;
+			lock(queueLock)
+			{
+				zombietospawn = SpawnQueue.Dequeue();
+			}
+			Transform spawnedZombie = Instantiate (zombietospawn, spawnpoint, Quaternion.identity) as Transform;
+			Zombie properties = spawnedZombie.GetComponent<Zombie> ();
+			properties.Track = track;
+			properties.TrackIndex = selectedWayPoint;
+			properties.TrackNumber = trackNumber;
 
-		lastWaypoint = selectedWayPoint;
+			lastWaypoint = selectedWayPoint;
+		}
 	}
 
 	// used by the zombies to decrement when they die
