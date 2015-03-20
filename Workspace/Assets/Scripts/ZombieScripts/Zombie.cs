@@ -54,7 +54,8 @@ public abstract class Zombie : MonoBehaviour
 				if( d100 <= BlackBoard.p && !JustSpawned )
 				{
 					// the zombies themselves should implement ondestroy to ensure the count is maintained
-					// TODO: access spawnpoint and decrement
+					// in the initializer. The code below is because destroy does not call ontriggerexit
+					Track[TrackIndex].GetComponent<SpawnAreaCounter>().DecrementCounter();
 					Destroy(gameObject);
 				}
 				else

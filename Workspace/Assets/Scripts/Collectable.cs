@@ -6,6 +6,7 @@ public class Collectable : MonoBehaviour
 {
 	void OnTriggerEnter(Collider collision)
 	{
-		Destroy(gameObject);
+		if( collider.transform.tag == "Player")
+			Destroy(gameObject);
 	}
 }

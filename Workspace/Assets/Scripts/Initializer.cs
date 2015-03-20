@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Initializer : MonoBehaviour 
 {
@@ -38,6 +39,7 @@ public class Initializer : MonoBehaviour
 
 	private int firstWaveCounter; // used to make sure the first wave of zombies are all easy
 	private bool firstWave = true;
+	private Queue<Transform> spawnQueue; //
 
 	// Use this for initialization
 	void Start () 
