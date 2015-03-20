@@ -58,13 +58,6 @@ public class Shambler : Classic
 		}
 
 		MoveIntoLane (TrackIndex, oldTrackIndex);
-
-		// once destination is set:
-		if( stopped )
-		{
-			stopped = false;
-			Nav.Resume();
-		}
 	}
 
 	protected void MoveIntoLane( int dest, int origin)

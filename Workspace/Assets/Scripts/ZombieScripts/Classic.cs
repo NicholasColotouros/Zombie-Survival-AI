@@ -4,7 +4,6 @@ using System.Collections;
 public class Classic : Zombie 
 {
 	protected float CloseDist = 10f; // distance that a zombie is considered too close
-	protected bool stopped = false;
 
 	protected override void AdditionalSetup ()
 	{
@@ -16,7 +15,6 @@ public class Classic : Zombie
 	protected override void ZombieMovement ()
 	{
 		bool detectedZombie = false;
-		// TODO: bugged. resume is never hit
 		Vector3 direction = gameObject.transform.forward;
 		
 		RaycastHit hit;
@@ -29,19 +27,12 @@ public class Classic : Zombie
 				Debug.Log(hit.transform.name);
 			
 				detectedZombie = true;
-				if( ! stopped )
-				{
-					Debug.Log("st");
-					Nav.Stop();
-				}
-				stopped = true;
+				Nav.Stop();
 			}
 		}
-		if( ! detectedZombie && stopped)
+		if( ! detectedZombie)
 		{
-			Debug.Log("resume" );
 			Nav.Resume();
-			stopped = false;
 		}
 	}
 
