@@ -22,6 +22,7 @@ public abstract class Zombie : MonoBehaviour
 	{
 		BlackBoard = GameObject.Find ("Level").GetComponent<Initializer> ();
 		survivor = BlackBoard.Survivor;
+		direction = BlackBoard.Direction;
 		Nav = gameObject.GetComponent<NavMeshAgent> ();
 		speed = BlackBoard.v;
 
