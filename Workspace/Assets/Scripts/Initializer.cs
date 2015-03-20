@@ -72,7 +72,9 @@ public class Initializer : MonoBehaviour
 
 			if( firstWaveCounter == 0 ) firstWave = false;
 		}
-		else SpawnZombies ();
+		else if (!SurvivorSpotted) 
+			SpawnZombies ();
+
 	}
 
 	// spawns zombies while maintaining the ratio
@@ -145,7 +147,6 @@ public class Initializer : MonoBehaviour
 		lastWaypoint = index;
 		lock(easyLock)
 		{
-			Debug.Log("ho");
 			easy_spawned--;
 		}
 	}

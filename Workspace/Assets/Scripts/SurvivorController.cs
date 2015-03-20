@@ -8,6 +8,8 @@ public class SurvivorController : MonoBehaviour
 	public Transform[] Collectables;
 	public Transform goal;
 
+	public float TimeOut = 300f;
+
 	public bool EnableHumanInput; // for debug purposes, false disables controls
 
 	private int NextCollectable = 0;
@@ -30,11 +32,34 @@ public class SurvivorController : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		if( EnableHumanInput )
-			GetInput();
-		else
-			AIMove();
+		if( TimeOut > 0 )
+		{
+			TimeOut -= Time.deltaTime;
+			if( EnableHumanInput )
+				GetInput();
+			else
+				AIMove();
 
+			CheckSuccess();
+		}
+	}
+
+	// returns true if the survivor was successful
+	public bool CheckSuccess()
+	{
+		bool everythingCollected = true;
+		for( int i = 0; i < Collectables.Length; i++)
+		{
+			if( Collectables[i] != null ) 
+				everythingCollected = false;
+		}
+
+		Vector3 pos = gameObject.transform.position;
+		if( pos.x == goal.position.x && pos.z == goal.position.z && everythingCollected)
+		{
+			return true;
+		}
+		return false;
 	}
 
 	// this version isn't much of a survivor...
@@ -49,7 +74,10 @@ public class SurvivorController : MonoBehaviour
 			{
 				Nav.SetDestination( Collectables[NextCollectable].position );
 			}
-			else Nav.SetDestination( goal.position );
+			else
+			{
+				Nav.SetDestination( goal.position );
+			}
 		}
 	}
 

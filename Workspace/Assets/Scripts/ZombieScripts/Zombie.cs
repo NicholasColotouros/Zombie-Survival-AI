@@ -54,6 +54,7 @@ public abstract class Zombie : MonoBehaviour
 				if( d100 <= BlackBoard.p && !JustSpawned )
 				{
 					// the zombies themselves should implement ondestroy to ensure the count is maintained
+					// TODO: access spawnpoint and decrement
 					Destroy(gameObject);
 				}
 				else
