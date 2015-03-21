@@ -8,9 +8,9 @@ public class CellPhone : Shambler
 	protected override void AdditionalSetup ()
 	{
 		InvokeRepeating ("ChangeTracks", 5f, 5f);
-		InvokeRepeating ("ChangeDirection", 7f, 7f);
-		InvokeRepeating ("LookAtCellPhone", 10f, 10f);
-		InvokeRepeating ("ChangeSpeed", 1f, 1f);
+//		InvokeRepeating ("ChangeDirection", 2f, 2f);
+//		InvokeRepeating ("LookAtCellPhone", 10f, 10f);
+//		InvokeRepeating ("ChangeSpeed", 1f, 1f);
 	}
 
 	protected void ChangeDirection()
@@ -27,9 +27,18 @@ public class CellPhone : Shambler
 		if( diceroll == 1)
 		{
 			if(direction == Initializer.ZombieMovementDirection.Clockwise)
+			{
 				direction = Initializer.ZombieMovementDirection.CounterClockwise;
+
+			}
 			else
+			{
 				direction = Initializer.ZombieMovementDirection.Clockwise;
+			}
+			AssignNextWayPoint();
+			Nav.SetDestination( Track[TrackIndex].position);
+
+			gameObject.transform.Rotate( new Vector3(0, 180, 0));
 		}
 	}
 
@@ -44,7 +53,7 @@ public class CellPhone : Shambler
 		int diceroll = Random.Range (0, 2);
 		if( diceroll == 1 )
 		{
-			Nav.Stop();
+			Nav.SetDestination(transform.position);
 			Invoke( "PutAwayCellPhone", 3f);
 		}
 	}
@@ -57,7 +66,7 @@ public class CellPhone : Shambler
 
 	protected void PutAwayCellPhone()
 	{
-		Nav.Resume ();
+		Nav.SetDestination (Track [TrackIndex].position);
 	}
 
 	void OnDestroy()

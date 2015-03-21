@@ -65,7 +65,6 @@ public abstract class Zombie : MonoBehaviour
 					JustSpawned = false;
 				}
 			}
-
 		}
 		else 
 		{
@@ -123,7 +122,7 @@ public abstract class Zombie : MonoBehaviour
 
 	protected abstract void ZombieMovement();
 
-	private void AssignNextWayPoint()
+	protected void AssignNextWayPoint()
 	{
 		if(direction == Initializer.ZombieMovementDirection.Clockwise)
 			TrackIndex = (TrackIndex + 1) % Track.Length;
