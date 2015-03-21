@@ -118,8 +118,6 @@ public abstract class Zombie : MonoBehaviour
 				BlackBoard.SurvivorSpotted = true;
 				SurvivorSpotted = true;
 			}
-
-			// TODO: check alcoves
 		}
 	}
 
