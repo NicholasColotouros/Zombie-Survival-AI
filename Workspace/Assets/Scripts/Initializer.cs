@@ -39,6 +39,7 @@ public class Initializer : MonoBehaviour
 	private Object queueLock = new Object();
 
 	private Queue<Transform> SpawnQueue;
+	private Transform[][] tracks;
 
 	// Use this for initialization
 	void Start () 
@@ -68,15 +69,20 @@ public class Initializer : MonoBehaviour
 			SpawnQueue.Enqueue( EasyZombies[diceroll] );
 			easy_spawned++;
 		}
+
+		tracks = new Transform[3][];
+		tracks [0] = OuterTrack;
+		tracks [1] = MiddleTrack;
+		tracks [2] = InnerTrack;
 	}
 	
 	// Update is called once per frame
 	void Update () 
 	{
 		MaintainZombies ();
-		SpawnZombie (InnerTrack, 2);
-		SpawnZombie (MiddleTrack, 1);
-		SpawnZombie (OuterTrack, 0);
+
+		int trackSelected = Random.Range(0, 3);
+		SpawnZombie(tracks[trackSelected], trackSelected);
 	}
 
 	// Adds zombies to the spawn queue while maintaining the ratio

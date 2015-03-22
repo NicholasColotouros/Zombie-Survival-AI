@@ -17,6 +17,8 @@ public abstract class Zombie : MonoBehaviour
 	protected bool SurvivorSpotted = false;
 	private bool JustSpawned = true; // to prevent immediate despawn
 
+	protected Object NavLock = new Object();
+
 	// Use this for initialization
 	void Start () 
 	{
@@ -61,7 +63,7 @@ public abstract class Zombie : MonoBehaviour
 				else
 				{
 					AssignNextWayPoint();
-					Nav.SetDestination( Track[TrackIndex].position);
+					lock(NavLock){Nav.SetDestination( Track[TrackIndex].position);}
 					JustSpawned = false;
 				}
 			}
@@ -69,7 +71,7 @@ public abstract class Zombie : MonoBehaviour
 		else 
 		{
 			// chase the survivor
-			Nav.SetDestination(survivor.position);
+			lock(NavLock){Nav.SetDestination(survivor.position);}
 		}
 	}
 
@@ -82,7 +84,7 @@ public abstract class Zombie : MonoBehaviour
 
 		RaycastHit hit;
 		LayerMask mask = ~(1 << LayerMask.NameToLayer ("Zombies"));
-		if(Physics.Raycast(guardPos, playerDirection, out hit, 200f, mask))
+		if(Physics.Raycast(guardPos, playerDirection, out hit, 500f, mask))
 		{
 			bool seen = false;
 			if(hit.transform.tag == "Player")

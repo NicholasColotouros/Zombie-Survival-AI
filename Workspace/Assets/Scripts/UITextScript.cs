@@ -8,6 +8,7 @@ public class UITextScript : MonoBehaviour
 	private SurvivorController Survivor;
 	private Initializer ZombieHorde;
 	private Text UIText;
+	private bool SimulationComplete = false;
 
 	// Use this for initialization
 	void Start () 
@@ -20,20 +21,23 @@ public class UITextScript : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		if( ZombieHorde.SurvivorSpotted )
+		if( ZombieHorde.SurvivorSpotted && ! SimulationComplete)
 		{
 			UIText.color = Color.red;
 			UIText.text = "FAILURE";
+			SimulationComplete = true;
 		}
-		else if( Survivor.TimeOut < 0 )
+		else if( Survivor.TimeOut < 0  && ! SimulationComplete)
 		{
 			UIText.color = Color.red;
 			UIText.text = "TIME UP";
+			SimulationComplete = true;
 		}
-		else if (Survivor.CheckSuccess())
+		else if (Survivor.CheckSuccess() && ! SimulationComplete)
 		{
 			UIText.color = Color.green;
 			UIText.text = "SUCCESS";
+			SimulationComplete = true;
 		}
 	}
 }

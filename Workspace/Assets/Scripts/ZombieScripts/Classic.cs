@@ -27,12 +27,12 @@ public class Classic : Zombie
 				Debug.Log(hit.transform.name);
 			
 				detectedZombie = true;
-				Nav.Stop();
+				lock(NavLock){Nav.Stop();}
 			}
 		}
 		if( ! detectedZombie)
 		{
-			Nav.Resume();
+			lock(NavLock){Nav.Resume();}
 		}
 	}
 
