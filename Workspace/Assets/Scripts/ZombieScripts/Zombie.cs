@@ -9,6 +9,8 @@ public abstract class Zombie : MonoBehaviour
 	public int TrackIndex; // index in the track
 	public Initializer.ZombieMovementDirection direction;
 
+	public bool seenBySurvivor = false; // used by the survivor
+
 	protected Transform survivor;
 	protected Initializer BlackBoard;
 	protected NavMeshAgent Nav;
@@ -96,6 +98,7 @@ public abstract class Zombie : MonoBehaviour
 			if( seen )
 			{
 				Base.renderer.enabled = true;
+				seenBySurvivor = true;
 			}
 			else
 			{

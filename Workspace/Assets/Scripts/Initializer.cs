@@ -40,10 +40,11 @@ public class Initializer : MonoBehaviour
 
 	private Queue<Transform> SpawnQueue;
 	private Transform[][] tracks;
-
+	private Transform Zombies; // where all of the zombies spawn
 	// Use this for initialization
 	void Start () 
 	{
+		Zombies = GameObject.Find ("Zombies").transform;
 		SpawnQueue = new Queue<Transform> ();
 		easy_spawned = 0;
 		hard_spawned = 0;
@@ -159,6 +160,7 @@ public class Initializer : MonoBehaviour
 				zombietospawn = SpawnQueue.Dequeue();
 			}
 			Transform spawnedZombie = Instantiate (zombietospawn, spawnpoint, Quaternion.identity) as Transform;
+			spawnedZombie.transform.parent = Zombies;
 			Zombie properties = spawnedZombie.GetComponent<Zombie> ();
 			properties.Track = track;
 			properties.TrackIndex = selectedWayPoint;
