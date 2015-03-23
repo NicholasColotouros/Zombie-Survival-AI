@@ -52,10 +52,14 @@ public class Shambler : Classic
 			// now switch to it
 			Vector3 translationVector = new Vector3(4, 0, 0);
 
+			float modifier = 1;
+			if(direction == Initializer.ZombieMovementDirection.Clockwise)
+				modifier = -1;
+
 			if( oldTrackNumber > TrackNumber )
-				gameObject.transform.Translate(translationVector);
+				gameObject.transform.Translate(translationVector * modifier);
 			else if( oldTrackNumber < TrackNumber )
-				gameObject.transform.Translate(translationVector * -1f);
+				gameObject.transform.Translate(translationVector * modifier * -1f);
 
 			lock(NavLock){Nav.SetDestination(Track[TrackIndex].position);}
 		}
