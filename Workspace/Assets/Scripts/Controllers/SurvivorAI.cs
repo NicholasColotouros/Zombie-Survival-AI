@@ -35,9 +35,13 @@ public class SurvivorAI : MonoBehaviour
 			{
 				if( ZombieSpotted() )
 				{
+					// TODO: check the distance of the zombie and which direction it's going relative to the survivor
+
+					// TODO: if the zombie is too close and/or coming for the player:
 					RunningAway = true;
 					GoToClosestSafeSpot();
 				}
+
 				else if(RunningAway)
 				{
 					if(DestinationReached())
@@ -55,7 +59,6 @@ public class SurvivorAI : MonoBehaviour
 				}
 				TimeOut -= Time.deltaTime;
 			}
-			else Debug.Log(300 - TimeOut);
 		}
 
 		else Nav.Stop();
@@ -134,7 +137,7 @@ public class SurvivorAI : MonoBehaviour
 		Vector3 closestSafeSpot = Vector3.one;
 		float safeSpotDistance = 999999.9f;
 
-		for(int i = 1; i < SafeSpots.Length; i++)
+		for(int i = 0; i < SafeSpots.Length; i++)
 		{
 			float dist = Vector3.Distance( position, SafeSpots[i].position);
 			if( dist  < safeSpotDistance )
