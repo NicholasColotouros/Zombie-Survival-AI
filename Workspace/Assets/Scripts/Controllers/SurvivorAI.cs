@@ -24,7 +24,6 @@ public class SurvivorAI : MonoBehaviour
 		Zombies = GameObject.Find ("Zombies").transform;
 		blackboard = GameObject.Find ("Level").GetComponent<Initializer> ();
 		Nav.speed = blackboard.v * 1.5f;
-		Nav.SetDestination (Waypoints [0].position);
 	}
 	
 	// Update is called once per frame
@@ -104,22 +103,17 @@ public class SurvivorAI : MonoBehaviour
 	// returns true if the survivor was successful
 	public bool CheckSuccess()
 	{
-		bool everythingCollected = true;
-		for( int i = 0; i < Waypoints.Length; i++)
-		{
-			if( Waypoints[i] != null ) 
-				everythingCollected = false;
-		}
-
 		Transform goal = Waypoints [Waypoints.Length - 1];
 		Vector3 pos = gameObject.transform.position;
-		if( pos.x == goal.position.x && pos.z == goal.position.z && everythingCollected)
+		if( pos.x == goal.position.x && pos.z == goal.position.z && nextWaypoint == Waypoints.Length)
 		{
 			return true;
 		}
 		return false;
 	}
 
+	// returns the distance to the closest zombie
+	// returns a negative number if none are spotted
 	private bool ZombieSpotted()
 	{
 		// check if zombie is in line of sight
