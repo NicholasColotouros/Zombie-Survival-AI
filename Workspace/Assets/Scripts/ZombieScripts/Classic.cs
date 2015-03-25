@@ -24,8 +24,6 @@ public class Classic : Zombie
 		{
 			if(hit.transform.gameObject.layer == LayerMask.NameToLayer("Zombies"))
 			{
-				Debug.Log(hit.transform.name);
-			
 				detectedZombie = true;
 				lock(NavLock){Nav.Stop();}
 			}
