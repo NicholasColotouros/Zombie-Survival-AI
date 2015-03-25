@@ -85,7 +85,7 @@ public abstract class Zombie : MonoBehaviour
 		Vector3 playerDirection = playerPos - guardPos;
 
 		RaycastHit hit;
-		LayerMask mask = ~(1 << LayerMask.NameToLayer ("Zombies"));
+		LayerMask mask = ~((1 << LayerMask.NameToLayer ("Zombies") | (1 << LayerMask.NameToLayer("Vision")) | (1 << LayerMask.NameToLayer("Ignore Raycast"))));
 		if(Physics.Raycast(guardPos, playerDirection, out hit, 500f, mask))
 		{
 			bool seen = false;
@@ -103,6 +103,7 @@ public abstract class Zombie : MonoBehaviour
 			else
 			{
 				Base.renderer.enabled = false;
+				seenBySurvivor = false;
 			}
 		}
 	}

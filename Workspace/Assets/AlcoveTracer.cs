@@ -10,6 +10,7 @@ public class AlcoveTracer : MonoBehaviour
 	Transform survivor;
 	private float AlcoveDistance = 7f;
 
+
 	// Use this for initialization
 	void Start () 
 	{

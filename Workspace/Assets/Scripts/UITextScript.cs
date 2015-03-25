@@ -5,7 +5,7 @@ using System.Collections;
 // Displays success and failure messages
 public class UITextScript : MonoBehaviour 
 {
-	private SurvivorController Survivor;
+	private SurvivorAI Survivor;
 	private Initializer ZombieHorde;
 	private Text UIText;
 	private bool SimulationComplete = false;
@@ -13,7 +13,7 @@ public class UITextScript : MonoBehaviour
 	// Use this for initialization
 	void Start () 
 	{
-		Survivor = GameObject.Find ("Survivor").transform.GetComponent<SurvivorController> ();
+		Survivor = GameObject.Find ("Survivor").transform.GetComponent<SurvivorAI> ();
 		ZombieHorde = GameObject.Find ("Level").transform.GetComponent<Initializer> ();
 		UIText = gameObject.GetComponent<Text> ();
 	}
@@ -27,7 +27,7 @@ public class UITextScript : MonoBehaviour
 			UIText.text = "FAILURE";
 			SimulationComplete = true;
 		}
-		else if( Survivor.TimeOut < 0  && ! SimulationComplete)
+		else if( Survivor.TimeOut <= 0  && ! SimulationComplete)
 		{
 			UIText.color = Color.red;
 			UIText.text = "TIME UP";
