@@ -14,8 +14,6 @@ public class SurvivorAI : MonoBehaviour
 	private Transform Zombies;
 	private Initializer blackboard;
 
-	private bool RunningAway = false;
-
 	private const float SAFE_DISTANCE = 20f;
 
 	// Use this for initialization
@@ -31,21 +29,13 @@ public class SurvivorAI : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		if( TimeOut > 0 )
+		if( TimeOut > 0 && ! blackboard.SurvivorSpotted )
 		{
 			if(nextWaypoint < Waypoints.Length)
 			{
 				if( InDanger() )
 				{
 					Nav.Stop();
-//					RunningAway = true;
-//					GoToClosestSafeSpot();
-				}
-
-				else if(RunningAway)
-				{
-					if(DestinationReached())
-						RunningAway = false;
 				}
 				else
 				{
@@ -60,7 +50,6 @@ public class SurvivorAI : MonoBehaviour
 				TimeOut -= Time.deltaTime;
 			}
 		}
-
 		else Nav.Stop();
 	}
 
@@ -150,11 +139,9 @@ public class SurvivorAI : MonoBehaviour
 			Transform Z = Zombies.GetChild(i);
 			if( CanSeeZombie(Z) )
 			{
-				//if( InAdjacentLanes(Z) )
-				//	return true;
-				if(Incoming(Z)) return true;
-				if( Vector3.Distance(pos, Z.position) < SAFE_DISTANCE )
-					return true;
+				if( Incoming(Z) && !InAdjacentLanes(Z) )
+					if( Vector3.Distance( Z.position, pos) < SAFE_DISTANCE)
+						return true;
 			}
 		}
 		return false;
@@ -192,7 +179,11 @@ public class SurvivorAI : MonoBehaviour
 				return false;
 			}
 
-			return (survivorTrackNumber > zombieTrackNumber + 1 || survivorTrackNumber < zombieTrackNumber - 1);
+
+			Debug.Log("Survivor: " + survivorTrackNumber + " Zombie: " + zombieTrackNumber);
+			return (survivorTrackNumber == zombieTrackNumber + 1 
+			        || survivorTrackNumber == zombieTrackNumber - 1
+			        || survivorTrackNumber == zombieTrackNumber);
 		}
 		Debug.Log ("hi");
 		return true;
