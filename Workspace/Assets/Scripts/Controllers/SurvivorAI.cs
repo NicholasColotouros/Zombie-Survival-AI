@@ -16,6 +16,8 @@ public class SurvivorAI : MonoBehaviour
 
 	private bool RunningAway = false;
 
+	private const float SAFE_DISTANCE = 20f;
+
 	// Use this for initialization
 	void Start () 
 	{
@@ -33,13 +35,11 @@ public class SurvivorAI : MonoBehaviour
 		{
 			if(nextWaypoint < Waypoints.Length)
 			{
-				if( ZombieSpotted() )
+				if( InDanger() )
 				{
-					// TODO: check the distance of the zombie and which direction it's going relative to the survivor
-
-					// TODO: if the zombie is too close and/or coming for the player:
-					RunningAway = true;
-					GoToClosestSafeSpot();
+					Nav.Stop();
+//					RunningAway = true;
+//					GoToClosestSafeSpot();
 				}
 
 				else if(RunningAway)
@@ -98,9 +98,33 @@ public class SurvivorAI : MonoBehaviour
 		{
 			return cp.seenBySurvivor;
 		}
-
-
 		return false;
+	}
+
+	public int GetTrackNumber(Transform Z)
+	{
+		Classic c = Z.GetComponent<Classic> ();
+		Shambler s = Z.GetComponent<Shambler> ();
+		Modern m = Z.GetComponent<Modern> ();
+		CellPhone cp = Z.GetComponent<CellPhone> ();
+		
+		if( c != null )
+		{
+			return c.TrackNumber;
+		}
+		if( s != null )
+		{
+			return s.TrackNumber;
+		}
+		if( m != null )
+		{
+			return m.TrackNumber;
+		}
+		if( cp != null )
+		{
+			return cp.TrackNumber;
+		}
+		return -2112;
 	}
 
 	// returns true if the survivor was successful
@@ -117,15 +141,74 @@ public class SurvivorAI : MonoBehaviour
 
 	// returns the distance to the closest zombie
 	// returns a negative number if none are spotted
-	private bool ZombieSpotted()
+	private bool InDanger()
 	{
 		// check if zombie is in line of sight
 		for( int i = 0; i < Zombies.childCount; i++ )
 		{
+			Vector3 pos = gameObject.transform.position;
 			Transform Z = Zombies.GetChild(i);
 			if( CanSeeZombie(Z) )
-				return true;
+			{
+				//if( InAdjacentLanes(Z) )
+				//	return true;
+				if(Incoming(Z)) return true;
+				if( Vector3.Distance(pos, Z.position) < SAFE_DISTANCE )
+					return true;
+			}
 		}
+		return false;
+	}
+
+	// TODO: return true if the survivor is in the same lane or an adjacent lane to the zombie
+	private bool InAdjacentLanes(Transform z)
+	{
+		Vector3 origin = gameObject.transform.position;
+		Vector3 direction = gameObject.transform.up * -1;
+		RaycastHit hit;
+
+		if(Physics.Raycast (origin, direction, out hit, 10f))
+		{
+			string name = hit.transform.name;
+			int survivorTrackNumber;
+			int zombieTrackNumber = GetTrackNumber(z);
+
+			// figure out where the survivor is
+			if( name.Equals("Main Floor"))
+				survivorTrackNumber = -1;
+			else if( name.Equals("Outer Track"))
+				survivorTrackNumber = 0;
+			else if( name.Equals("Middle Track"))
+				survivorTrackNumber = 1;
+			else if( name.Equals("Inner Track"))
+				survivorTrackNumber = 2;
+			else if( name.Equals("Center Area"))
+				survivorTrackNumber = 3;
+			else if( name.Equals("Alcoves"))
+				survivorTrackNumber = 4;
+			else
+			{
+				Debug.Log(name);
+				return false;
+			}
+
+			return (survivorTrackNumber > zombieTrackNumber + 1 || survivorTrackNumber < zombieTrackNumber - 1);
+		}
+		Debug.Log ("hi");
+		return true;
+	}
+
+	// checks if a zombie is coming towards the survivor
+	private bool Incoming(Transform z)
+	{
+		Vector3 pos = gameObject.transform.position;
+		Vector3 zVel = z.GetComponent<NavMeshAgent>().velocity;
+		Vector3 zPos = z.position;
+		Vector3 zNextPos = zPos + zVel;
+
+		if( Vector3.Distance( pos, zPos ) >= Vector3.Distance( pos, zNextPos ))
+			return true;
+
 		return false;
 	}
 
