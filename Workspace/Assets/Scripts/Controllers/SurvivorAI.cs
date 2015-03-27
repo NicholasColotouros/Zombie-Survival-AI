@@ -14,9 +14,8 @@ public class SurvivorAI : MonoBehaviour
 	private Transform Zombies;
 	private Initializer blackboard;
 	
-	private const float SAFE_DISTANCE = 20f;
-
-	public bool DangerClose = false;
+	private bool RunningAway = false;
+	private const float SAFE_DISTANCE = 30f;
 	
 	// Use this for initialization
 	void Start () 
@@ -31,11 +30,22 @@ public class SurvivorAI : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		if( TimeOut > 0 && ! blackboard.SurvivorSpotted )
+		if( TimeOut > 0 )
 		{
 			if(nextWaypoint < Waypoints.Length)
 			{
-				if( !InDanger() )
+				if( ZombieSpotted() )
+				{
+					RunningAway = true;
+					GoToClosestSafeSpot();
+				}
+				
+				else if(RunningAway)
+				{
+					if(DestinationReached())
+						RunningAway = false;
+				}
+				else
 				{
 					if(Waypoints[nextWaypoint] == null ) nextWaypoint++;
 					Nav.SetDestination(Waypoints[nextWaypoint].position);
@@ -48,6 +58,7 @@ public class SurvivorAI : MonoBehaviour
 				TimeOut -= Time.deltaTime;
 			}
 		}
+		
 		else Nav.Stop();
 	}
 	
@@ -85,33 +96,9 @@ public class SurvivorAI : MonoBehaviour
 		{
 			return cp.seenBySurvivor;
 		}
-		return false;
-	}
-	
-	public int GetTrackNumber(Transform Z)
-	{
-		Classic c = Z.GetComponent<Classic> ();
-		Shambler s = Z.GetComponent<Shambler> ();
-		Modern m = Z.GetComponent<Modern> ();
-		CellPhone cp = Z.GetComponent<CellPhone> ();
 		
-		if( c != null )
-		{
-			return c.TrackNumber;
-		}
-		if( s != null )
-		{
-			return s.TrackNumber;
-		}
-		if( m != null )
-		{
-			return m.TrackNumber;
-		}
-		if( cp != null )
-		{
-			return cp.TrackNumber;
-		}
-		return -2112;
+		
+		return false;
 	}
 	
 	// returns true if the survivor was successful
@@ -128,70 +115,21 @@ public class SurvivorAI : MonoBehaviour
 	
 	// returns the distance to the closest zombie
 	// returns a negative number if none are spotted
-	private bool InDanger()
+	private bool ZombieSpotted()
 	{
 		// check if zombie is in line of sight
 		for( int i = 0; i < Zombies.childCount; i++ )
 		{
-			Vector3 pos = gameObject.transform.position;
 			Transform Z = Zombies.GetChild(i);
 			if( CanSeeZombie(Z) )
 			{
-				if( Incoming(Z) || Vector3.Distance(pos, Z.position) < SAFE_DISTANCE)
-				{
-					Vector3 closestToFOV = Z.FindChild("AvoidanceRectangle").collider.ClosestPointOnBounds(pos);
-					float distToFOV = Vector3.Distance(pos, closestToFOV);
-
-					// TODO: figure out how to avoid the zombie
-
+				if( Incoming(Z) || Vector3.Distance(gameObject.transform.position, Z.position) < SAFE_DISTANCE)
 					return true;
-				}
 			}
 		}
 		return false;
 	}
 
-	// TODO: return true if the survivor is in the same lane or an adjacent lane to the zombie
-	private bool InAdjacentLanes(Transform z)
-	{
-		Vector3 origin = gameObject.transform.position;
-		Vector3 direction = gameObject.transform.up * -1;
-		RaycastHit hit;
-		
-		if(Physics.Raycast (origin, direction, out hit, 10f))
-		{
-			string name = hit.transform.name;
-			int survivorTrackNumber;
-			int zombieTrackNumber = GetTrackNumber(z);
-			
-			// figure out where the survivor is
-			if( name.Equals("Main Floor"))
-				survivorTrackNumber = -1;
-			else if( name.Equals("Outer Track"))
-				survivorTrackNumber = 0;
-			else if( name.Equals("Middle Track"))
-				survivorTrackNumber = 1;
-			else if( name.Equals("Inner Track"))
-				survivorTrackNumber = 2;
-			else if( name.Equals("Center Area"))
-				survivorTrackNumber = 3;
-			else if( name.Equals("Alcoves"))
-				survivorTrackNumber = 4;
-			else
-			{
-				return false;
-			}
-			
-			
-			Debug.Log("Survivor: " + survivorTrackNumber + " Zombie: " + zombieTrackNumber);
-			return (survivorTrackNumber == zombieTrackNumber + 1 
-			        || survivorTrackNumber == zombieTrackNumber - 1
-			        || survivorTrackNumber == zombieTrackNumber);
-		}
-		Debug.Log ("hi");
-		return true;
-	}
-	
 	// checks if a zombie is coming towards the survivor
 	private bool Incoming(Transform z)
 	{
@@ -206,7 +144,7 @@ public class SurvivorAI : MonoBehaviour
 		return false;
 	}
 	
-	private Vector3 GetClosestSafeSpot()
+	private void GoToClosestSafeSpot()
 	{
 		Vector3 position = gameObject.transform.position;
 		
@@ -223,6 +161,6 @@ public class SurvivorAI : MonoBehaviour
 				safeSpotDistance = dist;
 			}
 		}
-		return closestSafeSpot;
+		Nav.SetDestination(closestSafeSpot);
 	}
 }
